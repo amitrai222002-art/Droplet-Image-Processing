@@ -57,3 +57,13 @@ The main function is:
 ## Project Status
 
 Development version. Image-processing parameters may require adjustment depending on image quality, illumination, and experimental conditions.
+
+## Example Results
+
+### Original Experimental Image
+
+![Input Droplet](sample_images/input_droplet.jpg)
+
+### Detected Edges and Baseline
+
+![Processed Droplet](results/detected_edge and baseline.png)
