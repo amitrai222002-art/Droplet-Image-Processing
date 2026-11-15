@@ -6,19 +6,15 @@
 
 #Code summary
 #1.Detect top point using top_threshold
-#2.Convert img to 20/150 gray scale using gray threshold stored in thres_img
+#2.Convert img to 20/150 gray scale using gray threshold stored in thres_img var
 ## determining correct gray threshold is crucial run few trials
-#3.detect edges stored in edges
-#4 cropp image from detected top point to reduce time
-#5 detect baseline, use cutoff percentage to only check for baseline within specific range
-## if baseline detection doesnot work, before panicking adjust cutoff percentage
-#6 baseline is detected using horizontal row detection
+#3.detect edges are stored in edges var
+#4 crop image from detected top point to reduce time
+#5 if baseline detection doesnot work, adjust cutoff percentage
+#6 baseline is detected using horizontal row projection
 #7 detect countour points starting from top point working our way down until baseline
-#8innterpolation method is used in countour detection to avoid noise and reflection within drop
+#8 interpolation method is used in countour detection to avoid noise and reflection within drop
 
-## thakk gye bhaii
-
-#baseline -5 hua hai
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -115,7 +111,7 @@ def get(image_path, top_threshold, gray_threshold):
     max_index_in_cropped = np.argmax(restricted_row_sums)
 
     # Map it directly back to the original image coordinates by adding the offset
-    baseline_y = offset_y + max_index_in_cropped - 7
+    baseline_y = offset_y + max_index_in_cropped 
     print(f"Baseline_y Value:{baseline_y}")
 #---------------------------------------------------------------------------------------------------------------------------------------
 #Contour Detection(Interpolation approach)
@@ -132,7 +128,7 @@ def get(image_path, top_threshold, gray_threshold):
 
     y1 = top_y + 1
 
-    # --- FIX: Look for edge pixels (255) in 'edges' instead of solid body (150) in 'thresh_img' ---
+    # Looks for edge pixels (255) in 'edges' instead of solid body (150) in 'thresh_img' ---
     bright_pixels_y1 = np.where(edges[y1 - offset_y, :] == 255)[0]
 
     # Split candidates into left and right of the top point
@@ -152,7 +148,7 @@ def get(image_path, top_threshold, gray_threshold):
         right_points[y1] = top_x + 1
 
 
-    # STEP 3 & 5: Interpolate and Search (GUARANTEEING NO ROW SKIPS)
+    # STEP 3 & 5: Interpolate and Search (NO ROW SKIPS)
     # -------------------------------------------------------------------------
     drop_height = baseline_y - top_y
     for y in range(top_y + 2, baseline_y + 1):
@@ -161,7 +157,7 @@ def get(image_path, top_threshold, gray_threshold):
         pred_left_x = left_points[y - 1] + (left_points[y - 1] - left_points[y - 2])
         pred_right_x = right_points[y - 1] + (right_points[y - 1] - right_points[y - 2])
 
-        # --- FIX: Look for edge pixels (255) in 'edges' here as well ---
+        # Look for edge pixels (255) in 'edges' here as well ---
         bright_pixels = np.where(edges[y - offset_y, :] == 255)[0]
 
         # Split search pools to prevent left points from snapping to right-side noise
@@ -171,7 +167,8 @@ def get(image_path, top_threshold, gray_threshold):
         # --- LEFT SIDE CHECK ---
         # First Establish Adaptive max distance based on percentage of drop height
         fraction_down = (y - top_y) / drop_height
-
+        
+        #Max_Distance is a technique adapted to restrict very far off points in a row to be taken as valid candidate point
         if fraction_down <= 0.8:
             max_distance = 100
 
@@ -184,7 +181,7 @@ def get(image_path, top_threshold, gray_threshold):
                 (fraction_down - 0.05) / (0.80 - 0.10)
             ) * (100 - 40)
 
-        # Now Continue.................    
+        # Now Continue...  
         if len(left_cands) > 0:
             distances = np.abs(left_cands - pred_left_x)
             closest_idx = np.argmin(distances)
@@ -231,13 +228,12 @@ def get(image_path, top_threshold, gray_threshold):
         distance = right_points[y] - left_points[y]
 
         # Because distance = diameter, we divide by 2 to get the true radius 'r'
-        #
         r = distance / 2.0 
 
         # Square it and add to the running total
         sum_r_squared += (r ** 2)
 
-    Volume = (np.pi) * sum_r_squared  #* 0.0030520372**3
+    Volume = (np.pi) * sum_r_squared  #your pixel to real length scale 
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
 # Visualise-------------------------------------------------------------------------------------------------------------------------------
@@ -325,46 +321,13 @@ def get(image_path, top_threshold, gray_threshold):
 # In[61]:
 
 
-path = "/home/kratos/Hydrophilic/1 M/1st drop/1sec/on Al again20260924122554408.jpg"
+path = "  " #The path of image
 Volume = get(image_path = path,
              top_threshold = 12,
              gray_threshold = 70)
 print(Volume)  
 
 
-
-
-# In[2]:
-
-
-path = "/home/kratos/Hydrophobic/0.01 Molar/1st drop/on Al again20260908111802130.jpg"
-Volume = get(image_path = path,
-             top_threshold = 15,
-             gray_threshold = 70)
-print(Volume)  
-
-
-# In[20]:
-
-
-path = "/home/kratos/Hydrophobic/1 Molar/3rd drop/1sec_3rd drop/on Al again20260915125238973.jpg"
-Volume = get(image_path = path,
-             top_threshold = 15,
-             gray_threshold = 90)
-print(Volume)
-
-
-# In[25]:
-
-
-path = "/home/kratos/Hydrophobic/1 Molar/2nd drop/1sec_2nd drop/on Al again20260910164405361.jpg"
-Volume = get(image_path = path,
-             top_threshold = 15,
-             gray_threshold = 90)
-print(Volume)
-
-
-# In[ ]:
 
 
 
