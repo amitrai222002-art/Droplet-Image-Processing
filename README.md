@@ -62,8 +62,8 @@ Development version. Image-processing parameters may require adjustment dependin
 
 ### Original Experimental Image
 
-![Input Droplet](sample_images/input_droplet.jpg)
+![Input Droplet](sample_images/input_image.jpg)
 
 ### Detected Edges and Baseline
 
-![Processed Droplet](results/detected_edge and baseline.png)
+![Processed Droplet](results/detected edge and baseline.png)
