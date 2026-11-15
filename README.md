@@ -20,15 +20,23 @@ The algorithm uses grayscale thresholding, Sobel edge detection, baseline detect
 
 ## Volume Calculation
 
-The volume is estimated using:
+The droplet volume is estimated by dividing the droplet into thin horizontal circular slices.
 
-\[
-V \approx \pi \sum_y r_y^2 \Delta y
-\]
+The volume is calculated as:
 
-where \(r_y\) is the droplet radius at a given image row and \(\Delta y\) is the physical distance represented by one pixel in the vertical direction.
+**V ≈ π × Σ(rᵧ² × Δy)**
 
-**Note:** Physical volume requires pixel-to-length calibration in both image directions. The current code returns a pixel-based quantity before such calibration.
+where:
+
+- V = Droplet volume
+- rᵧ = Radius of the droplet at image row y
+- Δy = Physical height represented by one pixel
+
+**Note:** The current implementation calculates:
+
+**V = π × Σ(rᵧ²)**
+
+This is a pixel-based volume estimate. Physical volume requires calibration to convert pixel dimensions into physical lengths.
 
 ## Requirements
 
